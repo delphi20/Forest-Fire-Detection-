@@ -273,3 +273,24 @@ for i, index in enumerate(errors[:30]):  # Displaying the first 30 errors
 
 # Showing the figure
 plt.show()
+
+# evaluating the model and printing test set loss and accuracy 
+score = model.evaluate(X_test, y_test, verbose=0)
+print('Test set loss:', score[0])
+print('Test set accuracy:', round(score[1]*100, 3), "%")
+
+
+# carrying out prediction using the model and printing a confusion matrix using the values 
+Y_pred = model.predict(X_test)
+Y_pred = np.where(Y_pred < 0.5, 0, 1)
+y_test = y_test.astype(int)
+
+plt.figure(figsize = (7,7))
+
+sns.heatmap(confusion_matrix(y_test, Y_pred),annot = True, fmt='g')
+plt.title("CONFUSION MATRIX")
+plt.xlabel("Predicted")
+plt.ylabel("True")
+
+plt.show()
+
