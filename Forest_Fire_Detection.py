@@ -122,3 +122,46 @@ for i, image in enumerate(images):
         ax[1, i-5].axis('off')
 # Showing the figure
 plt.show()
+
+#storing data as numpy arrays 
+X_sample = np.array(X)
+Y_sample = np.array(y)
+# normalising data to fit 0 to 1 values for cnn
+X_sample = X_sample.astype('float32')
+X_sample /=255
+
+X_test = np.array(X_test)
+y_test = np.array(y_test)
+
+X_test = X_test.astype('float32')
+X_test /=255
+#test train splitting 
+X_train, X_val, Y_train, Y_val = train_test_split(X_sample, Y_sample, train_size = 0.7, shuffle=True)
+
+
+# creating the model and adding layers
+model = Sequential()
+model.add(Conv2D(32, (3, 3), input_shape = (img_size, img_size, 3), activation = 'relu'))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+model.add(Dropout(0.2))
+# adding conv2d and maxpooling layers
+model.add(Conv2D(32, (3, 3), activation = 'relu'))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+#more conv2d and dropout layers
+model.add(Conv2D(64, (3, 3), activation = 'relu'))
+#model.add(SpatialDropout2D(0.2))
+model.add(Dropout(0.2))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+
+model.add(Conv2D(128, (3, 3), activation = 'relu'))
+model.add(SpatialDropout2D(0.4))
+model.add(MaxPooling2D(pool_size = (2, 2)))
+# flattening the input 
+model.add(Flatten())
+# 
+model.add(Dense(units = 256, activation = 'relu'))
+model.add(Dropout(0.4))
+model.add(Dense(units = 256, activation = 'relu'))
+model.add(Dropout(0.2))
+# making the data output fit to 10 classes
+model.add(Dense(units = 1, activation = 'sigmoid'))
