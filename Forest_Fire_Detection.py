@@ -1,4 +1,5 @@
 
+# Importing Libraries
 import visualkeras
 import numpy as np
 import pandas as pd
@@ -44,11 +45,15 @@ import numpy as np
 import cv2
 from tensorflow.keras.applications.vgg16 import preprocess_input
 
+
+#Fethcing and divinding the dataset into suitable variables
 train_fire_image_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Training and Validation/fire") #change paths to your current directory
 train_non_fire_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Training and Validation/noFire")
 test_fire_image_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Testing\\testfire")
 test_non_fire_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Testing\\nofire")
 
+
+# Defining train and test datasets and labels
 train_data_images = {
     "Fire":list(train_fire_image_path.glob("*.jpg")),
     "Non_Fire":list(train_non_fire_path.glob("*.jpg"))
@@ -61,6 +66,7 @@ train_labels = {
     "Fire":0,"Non_Fire":1
 }
 
+# Cleaning and Resizing the images in the dataset
 X, y = [], []
 train_count = 0
 test_count = 0
@@ -85,3 +91,34 @@ for label, images in test_data_images.items():
             img = cv2.resize(img, (img_size, img_size))
             X_test.append(img)
             y_test.append(train_labels[label])
+
+
+df_train = pd.DataFrame({"image": X,
+                       "label": y})
+df_test = pd.DataFrame({"image": X_test,
+                       "label": y_test})
+
+# Plotting graph to see the datasets
+sns.countplot(df_train["label"], palette='RdYlBu')
+
+sample = df_train.sample(10)
+
+# Converting images to numpy arrays
+images = [np.array(image) for image in sample.image]
+
+# Creating a figure and an axis
+fig, ax = plt.subplots(2, 5, figsize=(10, 4))
+
+# Drawing the images on the axis
+for i, image in enumerate(images):
+    texto = "Fire" if sample.iloc[i].label == 0 else "No Fire"
+    if i < 5:
+        ax[0, i].imshow(image)
+        ax[0, i].text(0.5, -0.1, texto, transform=ax[0, i].transAxes, ha="center")
+        ax[0, i].axis('off')
+    else:
+        ax[1, i-5].imshow(image)
+        ax[1, i-5].text(0.5, -0.1, texto, transform=ax[1, i-5].transAxes, ha="center")
+        ax[1, i-5].axis('off')
+# Showing the figure
+plt.show()
