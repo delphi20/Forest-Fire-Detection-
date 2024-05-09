@@ -43,3 +43,45 @@ from PIL import Image, ImageTk
 import numpy as np
 import cv2
 from tensorflow.keras.applications.vgg16 import preprocess_input
+
+train_fire_image_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Training and Validation/fire") #change paths to your current directory
+train_non_fire_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Training and Validation/noFire")
+test_fire_image_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Testing\\testfire")
+test_non_fire_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Testing\\nofire")
+
+train_data_images = {
+    "Fire":list(train_fire_image_path.glob("*.jpg")),
+    "Non_Fire":list(train_non_fire_path.glob("*.jpg"))
+}
+test_data_images = {
+    "Fire":list(test_fire_image_path.glob("*.jpg")),
+    "Non_Fire":list(test_non_fire_path.glob("*.jpg"))
+}
+train_labels = {
+    "Fire":0,"Non_Fire":1
+}
+
+X, y = [], []
+train_count = 0
+test_count = 0
+img_size = 100
+for label, images in train_data_images.items():
+    for image in images:
+        train_count = train_count+1
+        img = cv2.imread(str(image)) # Reading the image
+        if img is not None:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (img_size, img_size))
+            X.append(img)
+            y.append(train_labels[label])
+
+X_test, y_test = [], []
+for label, images in test_data_images.items():
+    for image in images:
+        test_count = test_count+1
+        img = cv2.imread(str(image)) # Reading the image
+        if img is not None:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img = cv2.resize(img, (img_size, img_size))
+            X_test.append(img)
+            y_test.append(train_labels[label])
