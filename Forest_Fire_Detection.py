@@ -228,3 +228,48 @@ gc.collect()
 score = model.evaluate(X_val, Y_val, verbose=0)
 print('Validation loss:', score[0])
 print('Validation accuracy:', round(score[1]*100, 3), "%")
+
+
+# Making Predictions and plotting Heatmap between True and Predicted Values
+Y_pred = model.predict(X_val)
+Y_pred = np.where(Y_pred < 0.5, 0, 1)
+Y_val = Y_val.astype(int)
+
+plt.figure(figsize = (7,7))
+
+sns.heatmap(confusion_matrix(Y_val, Y_pred),annot = True, fmt='g')
+plt.title("CONFUSION MATRIX")
+plt.xlabel("Predicted")
+plt.ylabel("True")
+
+plt.show()
+
+
+# Making Predictions and Showing Results using trained model
+errors = []
+for i in range(0, len(Y_pred)):
+    if Y_pred[i] != Y_val[i]:
+        errors.append(i)
+
+# Creating a figure and an axis
+fig, ax = plt.subplots(3, 10, figsize=(20, 6))
+
+# Drawing the images on the axis
+for i, index in enumerate(errors[:30]):  # Displaying the first 30 errors
+    valor_real = "No Fire" if Y_val[index] == 0 else "Fire"
+    valor_predict = "Fire" if Y_pred[index] == 0 else "No Fire"
+    if i < 10:
+        ax[0, i].imshow(X_val[index])
+        ax[0, i].text(0.5, -0.25, f"Real: {valor_real}, \n Predicted: {valor_predict}", transform=ax[0, i].transAxes, ha="center")
+        ax[0, i].axis('off')
+    elif i < 20:
+        ax[1, i-10].imshow(X_val[index])
+        ax[1, i-10].text(0.5, -0.25, f"Real: {valor_real}, \n Predicted: {valor_predict}", transform=ax[1, i-10].transAxes, ha="center")
+        ax[1, i-10].axis('off')
+    else:
+        ax[2, i-20].imshow(X_val[index])
+        ax[2, i-20].text(0.5, -0.25, f"Real: {valor_real}, \n Predicted: {valor_predict}", transform=ax[2, i-20].transAxes, ha="center")
+        ax[2, i-20].axis('off')
+
+# Showing the figure
+plt.show()
