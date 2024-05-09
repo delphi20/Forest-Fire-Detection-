@@ -200,3 +200,31 @@ datagen = ImageDataGenerator(
         vertical_flip=False)  # randomly flip images
 
 datagen.fit(X_train)
+
+# saving history for the model and fitting it to the data 
+history = model.fit(datagen.flow(X_train, Y_train, batch_size=48), 
+#history = model.fit(X_train, Y_train,   
+          batch_size=48,
+          epochs=50,
+          validation_data=(X_val, Y_val),
+          callbacks=[early_stoppping,reduce_lr_on_plateau])
+
+# creating the function for the loss and accuracy to plot a graph
+def graphLossAcurracy(loss, val_loss, accuracy, val_accuracy):
+    fig, ax = plt.subplots(1,2, figsize=(16,8))
+    ax[0].plot(loss, color='b', label="Training loss")
+    ax[0].plot(val_loss, color='r', label="validation loss",axes =ax[0])
+    legend = ax[0].legend(loc='best', shadow=True)
+
+    ax[1].plot(accuracy, color='b', label="Training accuracy")
+    ax[1].plot(val_accuracy, color='r',label="Validation accuracy")
+    legend = ax[1].legend(loc='best', shadow=True)
+
+#calling the function 
+graphLossAcurracy(history.history['loss'], history.history['val_loss'], history.history['accuracy'], history.history['val_accuracy'])
+
+# saving the model loss and accuracy 
+gc.collect()
+score = model.evaluate(X_val, Y_val, verbose=0)
+print('Validation loss:', score[0])
+print('Validation accuracy:', round(score[1]*100, 3), "%")
