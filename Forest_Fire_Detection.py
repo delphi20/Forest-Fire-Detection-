@@ -135,8 +135,14 @@ y_test = np.array(y_test)
 
 X_test = X_test.astype('float32')
 X_test /=255
+
 #test train splitting 
 X_train, X_val, Y_train, Y_val = train_test_split(X_sample, Y_sample, train_size = 0.7, shuffle=True)
+
+# Number of data in each variables for train and test sets
+print(f"Data Number on X_train: {len(X_train)}")
+print(f"Data Number on X_val: {len(X_val)}")
+print(f"Data Number on X_test: {len(X_test)}")
 
 
 # creating the model and adding layers
@@ -165,3 +171,32 @@ model.add(Dense(units = 256, activation = 'relu'))
 model.add(Dropout(0.2))
 # making the data output fit to 10 classes
 model.add(Dense(units = 1, activation = 'sigmoid'))
+
+
+#Showing my model:
+visualkeras.layered_view(model, legend=True)
+
+# Compiling the Model
+model.compile(optimizer='adam',
+              loss='binary_crossentropy',
+              metrics=['accuracy'])
+
+# Defining Early Stop condition for Epochs
+early_stoppping = EarlyStopping(monitor = 'val_loss', mode = 'min', patience = 30, restore_best_weights = True)
+reduce_lr_on_plateau = ReduceLROnPlateau(monitor='val_loss',factor=0.2,patience=5)
+
+# Shifting the images inroder to improve training
+datagen = ImageDataGenerator(
+        featurewise_center=False,  # set input mean to 0 over the dataset
+        samplewise_center=False,  # set each sample mean to 0
+        featurewise_std_normalization=False,  # divide inputs by std of the data
+        samplewise_std_normalization=False,  # divide each input by its std
+        zca_whitening=False,  # dimesion reduction
+        rotation_range=10,  # randomly rotate images in the range 10 degrees
+        zoom_range = 0.1, # Randomly zoom image 10%
+        width_shift_range=0.1,  # randomly shift images horizontally 10%
+        height_shift_range=0.1,  # randomly shift images vertically 10%
+        horizontal_flip=True,  # randomly flip images
+        vertical_flip=False)  # randomly flip images
+
+datagen.fit(X_train)
