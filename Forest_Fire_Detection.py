@@ -1,4 +1,3 @@
-
 # Importing Libraries
 import visualkeras
 import numpy as np
@@ -11,6 +10,10 @@ import pathlib as pl
 import glob
 import cv2
 from sklearn.model_selection import train_test_split
+
+# Debugging
+import pdb
+pdb.set_trace()  # breakpoint
 
 # Machine Learning
 from tensorflow import keras
@@ -33,7 +36,7 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import confusion_matrix, precision_recall_fscore_support
 import itertools
 import matplotlib.pyplot as plt
-%matplotlib inline
+#matplotlib inline
 import warnings
 warnings.filterwarnings('ignore')
 
@@ -46,12 +49,13 @@ import cv2
 from tensorflow.keras.applications.vgg16 import preprocess_input
 
 
-#Fethcing and divinding the dataset into suitable variables
+#Fethching and divinding the dataset into suitable variables
 train_fire_image_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Training and Validation/fire") #change paths to your current directory
 train_non_fire_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Training and Validation/noFire")
 test_fire_image_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Testing\\testfire")
 test_non_fire_path = pl.Path("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\Dataset\data\Testing\\nofire")
 
+pdb.set_trace()  # breakpoint
 
 # Defining train and test datasets and labels
 train_data_images = {
@@ -65,6 +69,8 @@ test_data_images = {
 train_labels = {
     "Fire":0,"Non_Fire":1
 }
+
+pdb.set_trace()  # breakpoint
 
 # Cleaning and Resizing the images in the dataset
 X, y = [], []
@@ -81,6 +87,8 @@ for label, images in train_data_images.items():
             X.append(img)
             y.append(train_labels[label])
 
+pdb.set_trace()  # breakpoint
+
 X_test, y_test = [], []
 for label, images in test_data_images.items():
     for image in images:
@@ -92,22 +100,33 @@ for label, images in test_data_images.items():
             X_test.append(img)
             y_test.append(train_labels[label])
 
+pdb.set_trace()  # breakpoint
 
 df_train = pd.DataFrame({"image": X,
                        "label": y})
 df_test = pd.DataFrame({"image": X_test,
                        "label": y_test})
 
+pdb.set_trace()  # breakpoint
+
 # Plotting graph to see the datasets
 sns.countplot(df_train["label"], palette='RdYlBu')
 
+pdb.set_trace()  # breakpoint
+
 sample = df_train.sample(10)
+
+pdb.set_trace()  # breakpoint
 
 # Converting images to numpy arrays
 images = [np.array(image) for image in sample.image]
 
+pdb.set_trace()  # breakpoint
+
 # Creating a figure and an axis
 fig, ax = plt.subplots(2, 5, figsize=(10, 4))
+
+pdb.set_trace()  # breakpoint
 
 # Drawing the images on the axis
 for i, image in enumerate(images):
@@ -123,6 +142,8 @@ for i, image in enumerate(images):
 # Showing the figure
 plt.show()
 
+pdb.set_trace()  # breakpoint
+
 #storing data as numpy arrays 
 X_sample = np.array(X)
 Y_sample = np.array(y)
@@ -136,14 +157,19 @@ y_test = np.array(y_test)
 X_test = X_test.astype('float32')
 X_test /=255
 
+pdb.set_trace()  # breakpoint
+
 #test train splitting 
 X_train, X_val, Y_train, Y_val = train_test_split(X_sample, Y_sample, train_size = 0.7, shuffle=True)
+
+pdb.set_trace()  # breakpoint
 
 # Number of data in each variables for train and test sets
 print(f"Data Number on X_train: {len(X_train)}")
 print(f"Data Number on X_val: {len(X_val)}")
 print(f"Data Number on X_test: {len(X_test)}")
 
+pdb.set_trace()  # breakpoint
 
 # creating the model and adding layers
 model = Sequential()
@@ -172,18 +198,25 @@ model.add(Dropout(0.2))
 # making the data output fit to 10 classes
 model.add(Dense(units = 1, activation = 'sigmoid'))
 
+pdb.set_trace()  # breakpoint
 
 #Showing my model:
 visualkeras.layered_view(model, legend=True)
+
+pdb.set_trace()  # breakpoint
 
 # Compiling the Model
 model.compile(optimizer='adam',
               loss='binary_crossentropy',
               metrics=['accuracy'])
 
+pdb.set_trace()  # breakpoint
+
 # Defining Early Stop condition for Epochs
 early_stoppping = EarlyStopping(monitor = 'val_loss', mode = 'min', patience = 30, restore_best_weights = True)
 reduce_lr_on_plateau = ReduceLROnPlateau(monitor='val_loss',factor=0.2,patience=5)
+
+pdb.set_trace()  # breakpoint
 
 # Shifting the images inroder to improve training
 datagen = ImageDataGenerator(
@@ -199,7 +232,11 @@ datagen = ImageDataGenerator(
         horizontal_flip=True,  # randomly flip images
         vertical_flip=False)  # randomly flip images
 
+pdb.set_trace()  # breakpoint
+
 datagen.fit(X_train)
+
+pdb.set_trace()  # breakpoint
 
 # saving history for the model and fitting it to the data 
 history = model.fit(datagen.flow(X_train, Y_train, batch_size=48), 
@@ -208,6 +245,8 @@ history = model.fit(datagen.flow(X_train, Y_train, batch_size=48),
           epochs=50,
           validation_data=(X_val, Y_val),
           callbacks=[early_stoppping,reduce_lr_on_plateau])
+
+pdb.set_trace()  # breakpoint
 
 # creating the function for the loss and accuracy to plot a graph
 def graphLossAcurracy(loss, val_loss, accuracy, val_accuracy):
@@ -223,12 +262,15 @@ def graphLossAcurracy(loss, val_loss, accuracy, val_accuracy):
 #calling the function 
 graphLossAcurracy(history.history['loss'], history.history['val_loss'], history.history['accuracy'], history.history['val_accuracy'])
 
+pdb.set_trace()  # breakpoint
+
 # saving the model loss and accuracy 
 gc.collect()
 score = model.evaluate(X_val, Y_val, verbose=0)
 print('Validation loss:', score[0])
 print('Validation accuracy:', round(score[1]*100, 3), "%")
 
+pdb.set_trace()  # breakpoint
 
 # Making Predictions and plotting Heatmap between True and Predicted Values
 Y_pred = model.predict(X_val)
@@ -244,6 +286,7 @@ plt.ylabel("True")
 
 plt.show()
 
+pdb.set_trace()  # breakpoint
 
 # Making Predictions and Showing Results using trained model
 errors = []
@@ -251,8 +294,12 @@ for i in range(0, len(Y_pred)):
     if Y_pred[i] != Y_val[i]:
         errors.append(i)
 
+pdb.set_trace()  # breakpoint
+
 # Creating a figure and an axis
 fig, ax = plt.subplots(3, 10, figsize=(20, 6))
+
+pdb.set_trace()  # breakpoint
 
 # Drawing the images on the axis
 for i, index in enumerate(errors[:30]):  # Displaying the first 30 errors
@@ -274,11 +321,14 @@ for i, index in enumerate(errors[:30]):  # Displaying the first 30 errors
 # Showing the figure
 plt.show()
 
+pdb.set_trace()  # breakpoint
+
 # evaluating the model and printing test set loss and accuracy 
 score = model.evaluate(X_test, y_test, verbose=0)
 print('Test set loss:', score[0])
 print('Test set accuracy:', round(score[1]*100, 3), "%")
 
+pdb.set_trace()  # breakpoint
 
 # carrying out prediction using the model and printing a confusion matrix using the values 
 Y_pred = model.predict(X_test)
@@ -293,4 +343,3 @@ plt.xlabel("Predicted")
 plt.ylabel("True")
 
 plt.show()
-
