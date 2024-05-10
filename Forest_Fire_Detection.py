@@ -343,3 +343,60 @@ plt.xlabel("Predicted")
 plt.ylabel("True")
 
 plt.show()
+
+
+## Added the gui
+
+# Saving the model to HDF5 file
+model.save("forest_fire_f.h5")
+
+
+model = load_model("E:\Study\GIKI BAI Course Material\Fourth Semester BAI\AI202\Project\Code\\forest_fire_f.h5")  
+
+# Function to preprocess image
+def preprocess_image(image_path, target_size):
+    img = Image.open(image_path)
+    img = img.resize(target_size)
+    img = np.array(img)
+    img = img.astype("float32")
+    img /= 255.0
+    img = np.expand_dims(img, axis=0)
+    return img
+
+# Function to make predictions
+def predict_image(image_path):
+    img = preprocess_image(image_path, target_size=(100, 100)) 
+    prediction = model.predict(img)
+    return prediction
+
+# Function to handle image selection
+def select_image():
+    file_path = filedialog.askopenfilename()
+    if file_path:
+        prediction = predict_image(file_path)
+        if prediction[0][0] > 0.5:
+            result_label.config(text="No Fire")
+        else:
+            result_label.config(text="Forest onFire")
+        # Display selected image
+        image = Image.open(file_path)
+        image = image.resize((300, 300), Image.ANTIALIAS)
+        photo = ImageTk.PhotoImage(image)
+        image_label.config(image=photo)
+        image_label.image = photo
+
+# Create main window
+root = tk.Tk()
+root.title("Fire Detection")
+
+# Create widgets
+select_button = tk.Button(root, text="Select Image", command=select_image)
+select_button.pack(pady=10)
+
+image_label = tk.Label(root)
+image_label.pack(pady=10)
+
+result_label = tk.Label(root, text="")
+result_label.pack(pady=10)
+
+root.mainloop()
